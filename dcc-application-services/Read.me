@@ -1,0 +1,225 @@
+This Document describes the configuration we need to do in the Hosts before executing the Deployment
+
+Install docker engine ( Ubuntu Mechine)
+--------------------------------------------------------
+
+Uninstall all dependent installiation if already exist
+
+  >  for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+Make the Docker command non-root
+-------------------------------------------
+To create the docker group and add your user:
+
+Create the docker group.
+ 		sudo groupadd docker
+
+Add your user to the docker group.
+ 		sudo usermod -aG docker $USER
+
+Log out and log back in so that your group membership is re-evaluated.
+
+Update Host entres for accessing services in all hosts.
+-----------------------------------------------------------
+Add bellow information with relevent ip address to the host mechine , 
+If we are using multiple hosts each host should be configured with valid host entres. 
+
+Services. 
+---------------------------------
+
+mongodb.inaipi.app <ip-address-of-mongodb-server>
+eureka.inaipi.app <ip-address-of-eureka-service-host>
+redis.inaipi.app <ip-address-of-Redis-server>
+rabbitmq.inaipi.app <ip-address-of-rabbitmq>
+mssql.inaipi.app <ip-address-of-MSSQL-Server>
+
+Optional service deployment 
+----------------------------------
+In case of application service deployment with different servers Each server needs to be configured with the below details to reach inter services.
+
+
+social-webhook-dcc <ip-address-of-webhook-service-host-mechine>
+socket-server-dcc <ip-address-of-socket-service-host-mechine>
+chat-api-server-dcc <ip-address-of-chat-api-service-host-mechine>
+uilogs-api-dcc <ip-address-of-ui-logs-service-host-mechine>
+file-service-dcc <ip-address-of-file-service-host-mechine>
+report-api-dcc <ip-address-of-reporter-service-host-mechine>
+email-api-dcc <ip-address-of-email-service-host-mechine>
+usermodule-api-dcc <ip-address-of-user-management-service-host-mechine>
+email-analyser-dcc <ip-address-of-email-analyser-service-host-mechine>
+routing-engine-dcc <ip-address-of-routing-service-host-mechine>
+queuing-engine-dcc <ip-address-of-queuing-service-host-mechine>
+api-gateway-dcc <ip-address-of-gateway-service-host-mechine>
+
+Sample host entry 
+--------------------------------
+10.10.2.4 mongodb.inaipi.app
+10.10.2.4 eureka.inaipi.app
+10.10.2.4 redis.inaipi.app
+10.10.2.4 rabbitmq.inaipi.app
+10.10.2.4 mssql.inaipi.app
+10.10.2.4 apps.inaipi.app
+10.10.2.4 social-webhook-dcc
+10.10.2.4 socket-server-dcc
+10.10.2.4 chat-api-server-dcc
+10.10.2.4 uilogs-api-dcc
+10.10.2.4 file-service-dcc
+10.10.2.4 report-api-dcc
+10.10.2.4 email-api-dcc
+10.10.2.4 usermodule-api-dcc
+10.10.2.4 email-analyser-dcc
+10.10.2.4 routing-engine-dcc
+10.10.2.4 queuing-engine-dcc
+10.10.2.4 api-gateway-dcc
+
+
+for testing the services in a PC require to mapp all public domain names to the host mechine if it is not pointed in the DNS server
+--------------------------------------
+127.0.0.1 utils.xxxxxx.xxxxxx.com
+127.0.0.1 gateway.xxxxxx.xxxxxx.com
+127.0.0.1 dcc.xxxxxx.xxxxxx.com
+
+Queing Service deployment requre RabbitMQ needs to be updated with 
+-------------------------------------------------------------------
+"Test_ChatAPP_AgentActivity" queue
+
+steps->
+
+    - Login to portal of rabbitmq ( http://<ip>:15672)
+    - Navigate to queues menu
+    - add new queue
+    - give below parameters 
+        * type - clasic
+        * name - Test_ChatAPP_AgentActivity
+        * durable
+        * add aurgiment x-max-priority as 5
+    - Add 
+
+mongoDB Add user 
+-------------------
+after login to the mongodb-Compos or cli need to add a user like below
+use admin
+db.createUser(
+  {
+    user: "sa",
+    pwd: "Cognicx123",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+  }
+)
+
+Data base Initial setup with the backup. 
+----------------------------------------------
+https://29011986-my.sharepoint.com/:f:/g/personal/sarath_k_imperiumapp_com/EnIcnbtHQHVCkAW6CkSVw4UBqIVitkEcilIYMqxV-Gq55w?e=vQA5mW
+
+we can find the version specific backup of both mongoDB and MSSQL from the below link. 
+* for restoring the dump for mongoDB we can use the tool available in the same link. "mongorestore.exe"
+* For MSSQL we can use the MS SQL management Studio Version.
+
+install docker Engine 
+
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+
+Ngnix configuration 
+-----------------------
+install ngnix
+
+apt update 
+apt install nginx
+
+Copy and configure all the ngnix configurations as mentioned in the ngnix-configuration folder
+
+UI_Admin Static file deployment
+-------------------------------------
+* Download the build file from the below link 
+  https://29011986-my.sharepoint.com/personal/sarath_k_imperiumapp_com/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fsarath%5Fk%5Fimperiumapp%5Fcom%2FDocuments%2Fpublic%2Fdcc%2Dadmin%2Dpanels&ct=1695826270555&or=Teams%2DHL&ga=1
+
+* configre the environmental variables 
+    -> Client-> envconfig.js
+    -> Admin-> envconfig.js
+
+Agent UI configuration
+--------------------------------
+
+* Configure Agent Dashboard friendend parameters
+    -> open-container -> /usr/src/app/frontend/src/container/BaseUrl/BaseUrl.js
+    -> in the container need to take the React Rebuild by running "npm run build" command
+
+Note :  To login to the docker container of inaipi-digitial
+  --> docker exec -it ID /bin/bash , Replace ID with the container ID
+  --> install text editor nano by running command 'apt update && apt install nano'
+
+Socket io CORS Configuration 
+--------------------------------------
+Configure Socket.io with cors origin url ( the base url of agent Dashboard)
+  -> open-container -> /usr/src/app/config.json
+
+    Note :  To login to the docker container of inaipi-digitial
+      --> docker exec -it ID /bin/bash , Replace ID with the container ID
+      --> install text editor nano by running command 'apt update && apt install nano'
+
+Running a trial 
+--------------------------------------
+Check all working as expected 
+    -> http://dcc.devops.com/Client/?clientId=a3dc14bd-fe70-4120-8572-461b0dc866b5
+    -> http://dcc.devops.com/?tenantID=a3dc14bd-fe70-4120-8572-461b0dc866b5
+
+Creating Docker Build and psuhing image to registery for update.
+----------------------------------------------------------------------
+CLI->
+1. Update code in git
+2. Go to Build Mechine 
+3. Pull the code to build mechine directory ( eg. /home/app/)
+4. Build the image ( provide proper name and name space) docker build --rm -t <devopsedaya/inaipi-digital-channels-release-v-1.2.001> .
+5. push the code to DockerHub Registry docker image push <devopsedaya/inaipi-digital-channels-release-v-1.2.001:latest>
+
+GUI
+1. Update Code in git
+2. Go to build mechine
+3. open VS Code and and open the Service Folder. ( eg. in home-> apps)
+4. Pull the latest code by going into the terminal panel -> git pull
+5. In VS code From File browser navigation panel Right Click on Dockerfile -> Build image
+6. once build is completed navigate to Docker extention menu-> images-> find the latest image -> exapnd it and the tag 'Latest'
+7. Once image is sopted Right click-> push 
+8. Chose the Name space 'devopsedaya' -> confirm the image name -> hit enter. 
+9. Configrm all layers is uploaded
+
+Deplye new build. 
+1. Go to Server and Navigate to the deployement folder ( inaipi-dcc-deployee)
+2. Pull any Deplyment script change is done using git pull. 
+3. if deployement script is updated
+4. Navigate to dcc-application-services folder
+5. command docker compose pull , it will update the latest image 
+6. execute docker compose up -d <service-name)
+7. Cross verify the service is recreated not just started.
+
+
+
+
